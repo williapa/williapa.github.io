@@ -1,0 +1,1598 @@
+<!doctype html>
+<html lang="en" 
+    data-framework="angularjs">
+    <header>
+    	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.9/angular.js"></script>
+    	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.9/angular-route.min.js"></script>
+        <script type="text/javascript">
+        	//uncomment this section to run pokertest.js with node
+/*module.exports = {
+	determineWinner: determineWinner,
+	Card: Card,
+	Player: Player,
+	Deck: Deck,
+	sortByRank: sortByRank,
+	sortBySuit: sortBySuit,
+	flushRank: flushRank,
+	straightRank: straightRank,
+	straightFlushRank: straightFlushRank,
+	getFlushCards: getFlushCards,
+	straightFlushRank: straightFlushRank,
+	FOAKrank: FOAKrank,
+	TOAKrank: TOAKrank,
+	twoPairRank: twoPairRank,
+	pairRank: pairRank,
+	fullHouseRank: fullHouseRank,
+	highCardRank: highCardRank,
+	handStrength: handStrength
+};*/ 
+
+function determineWinner(player1, player2, boardcards){
+  var p1hand, p2hand;
+
+  if(player1.hand){
+    p1hand = player1.hand.concat(boardcards);
+ 	p2hand = player2.hand.concat(boardcards);
+  }
+  else{
+ 	p1hand = player1.concat(boardcards);
+ 	p2hand = player2.concat(boardcards);
+  }
+
+  var p1rank = 0, p2rank = 0;
+  p1rank = straightFlushRank(p1hand);
+  p2rank = straightFlushRank(p2hand);
+
+  if(p1rank > p2rank){
+    return player1;
+  }
+
+  if(p2rank > p1rank){
+    return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+ 	//if you have a straight flush tie it can't be resolved (hand uses 5 cards)
+ 	return 'TIE';
+  }
+
+  p1rank = FOAKrank(p1hand);
+  p2rank = FOAKrank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+  if(p2rank > p1rank){
+ 	return player2;
+  }
+  if(p2rank == p1rank && p1rank != 0){
+	var tie = resolveTie(p1hand, p2hand, "FOAK", p1rank);
+	if(tie == "tie"){
+      return "TIE";
+ 	}
+ 	else if(tie == "player1"){
+ 	  return player1;
+ 	}
+ 	else{
+ 	  return player2;
+ 	}
+  }
+
+  p1rank = fullHouseRank(p1hand);
+  p2rank = fullHouseRank(p2hand);
+
+  if(p1rank > p2rank){
+ 	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+  //cant resolve tie of hand that uses 5 cards
+    return 'TIE';
+  }
+
+  p1rank = flushRank(p1hand);
+  p2rank = flushRank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+	var tie = resolveTie(p1hand, p2hand, "FLUSH", p1rank);
+	if(tie == "tie"){
+      return "TIE";
+ 	}
+ 	else if(tie == "player1"){
+ 	  return player1;
+ 	}
+ 	else{
+ 	  return player2;
+ 	}
+ 	//return 'TIE';
+  }
+
+  p1rank = straightRank(p1hand);
+  p2rank = straightRank(p2hand);
+
+  if(p1rank > p2rank){
+ 	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+	return 'TIE';
+  }
+
+  p1rank = TOAKrank(p1hand);
+  p2rank = TOAKrank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+	var tie = resolveTie(p1hand, p2hand, "TOAK", p1rank);
+	if(tie == "tie"){
+      return "TIE";
+ 	}
+ 	else if(tie =="player1"){
+ 	  return player1;
+ 	}
+ 	else{
+ 	  return player2;
+ 	}
+
+ 	//return 'TIE';
+  }
+
+  p1rank = twoPairRank(p1hand);
+  p2rank = twoPairRank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+
+  if(p2rank > p1rank){
+    return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+    var tie = resolveTie(p1hand, p2hand, "TWOPAIR", p1rank);
+ 			
+ 	if(tie == "tie"){
+ 	  return "TIE";
+ 	}
+ 	else if(tie == "player1"){
+ 	  return player1;
+ 	}
+ 	else{
+ 	  return player2;
+ 	}
+ 	//return 'TIE';
+  }
+
+  p1rank = pairRank(p1hand);
+  p2rank = pairRank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+
+  if(p2rank == p1rank && p1rank != 0){
+ 	var tie = resolveTie(p1hand, p2hand, "PAIR", p1rank);
+ 	if(tie == "tie"){
+ 	  return "TIE";
+ 	}
+ 	else if(tie == "player1"){
+ 	  return player1;
+ 	}
+ 	else{
+ 	  return player2;
+ 	}
+  }
+
+  p1rank = highCardRank(p1hand);
+  p2rank = highCardRank(p2hand);
+
+  if(p1rank > p2rank){
+	return player1;
+  }
+
+  if(p2rank > p1rank){
+	return player2;
+  }
+  var tie = resolveTie(p1hand, p2hand, "highcard", p1rank);	
+  if(tie == "tie"){
+    return "TIE";
+  }
+  else if(tie == "player1"){
+    return player1;
+  }
+  else {
+    return player2;
+  }
+}  
+
+function Card(suit,rank){
+  this.suit = suit;
+  this.rank = rank;
+  return this;
+};
+
+function Player(name,chips){
+  this.hand = [];
+  this.firstName = name;
+  this.chips = parseInt(chips);
+  this.bet = function(amount){
+    this.chips -= amount;
+    return amount;
+  };
+
+  this.win = function(amount){
+    this.chips += amount;
+  };
+
+  this.deal = function(card){
+    this.hand.push(card);
+  };
+
+  return this;
+}
+
+function shuffle(array) {
+  var i = 0, j = 0, temp = null;
+  for (i = array.length - 1; i > 0; i -= 1) {
+    j = Math.floor(Math.random() * (i + 1));
+    temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  };
+  return array;
+}
+
+function Deck(){
+  this.cards = [];
+
+  for(var i = 2; i < 15; i++){
+    this.cards[(i-2)*4] = new Card("h", i);
+    this.cards[(i-2)*4+1] = new Card("s", i);
+    this.cards[(i-2)*4+2] = new Card("c", i);
+    this.cards[(i-2)*4+3] = new Card("d", i);
+  };
+
+  this.shuffle = function(){
+  	this.cards = shuffle (this.cards);
+  };
+
+  this.deal = function(){
+  	return this.cards.shift();
+  };
+
+  return this;
+}
+
+function sortByRank (cards){
+  return cards.sort(function(a,b){
+  	if(a.rank > b.rank) return -1;
+	if(a.rank < b.rank) return 1;
+    return 0;
+  });
+}
+
+function sortBySuit(cards){
+  return cards.sort( function(a,b){
+  	if(a.suit > b.suit) return -1;
+  	if(a.suit < b.suit) return 1;
+  	return 0;
+  });
+}
+
+function flushRank(cards){
+  sortBySuit(cards);
+  spadesCount = 0, heartsCount = 0, diamondsCount = 0, clubsCount = 0;
+  
+  for(var i = 0; i < cards.length; i++){
+			
+	if(cards[i].suit == "s") spadesCount++;
+
+	if(cards[i].suit == "h") heartsCount++;
+
+	if(cards[i].suit == "d") diamondsCount++;
+
+	if(cards[i].suit == "c") clubsCount++;
+  };
+
+  if( spadesCount > 4  || heartsCount > 4 || diamondsCount > 4 || clubsCount > 4){
+	return sortByRank(getFlushCards(cards))[0].rank;
+  };
+
+  return 0;
+}
+
+function straightRank(cards){
+  var hand = sortByRank(cards);
+
+  for(var i = 1; i < 11; i++){
+	haslowcard = false, hastwocard = false, hasthreecard = false, hasfourcard = false, hashighcard = false;
+	lowcard = i;
+	twocard = i+1;
+	threecard = i+2;
+	fourcard = i+3;
+	highcard = i+4;
+
+	if(i == 1){
+	  lowcard = 14;
+	};
+
+	for(var j = 0; j < hand.length; j++){
+      if(hand[j].rank == lowcard) haslowcard = true;
+      if(hand[j].rank == twocard) hastwocard = true;
+      if(hand[j].rank == threecard) hasthreecard = true;
+      if(hand[j].rank == fourcard) hasfourcard = true;
+      if(hand[j].rank == highcard) hashighcard = true;
+	};
+
+	if(haslowcard && hastwocard && hasthreecard && hasfourcard && hashighcard){
+      return highcard;	
+	}; 
+  };
+
+  return 0;
+}
+
+function getFlushCards (cards){
+
+  noflushcards = [];
+
+  sortBySuit(cards);
+
+  spades = [];
+  hearts = [];
+  diamonds = [];
+  clubs = [];
+
+  for(var i = 0; i < cards.length; i++){
+
+	if(cards[i].suit == "s") spades.push(cards[i]);
+
+	if(cards[i].suit == "h") hearts.push(cards[i]);
+
+	if(cards[i].suit == "d") diamonds.push(cards[i]);
+
+	if(cards[i].suit == "c") clubs.push(cards[i]);
+  };
+
+  if(spades.length > 4) return spades;
+		
+  if(hearts.length > 4) return hearts;
+
+  if(clubs.length > 4) return clubs;
+
+  if(diamonds.length > 4) return diamonds;
+
+  return noflushcards;
+}
+
+function straightFlushRank (cards){
+
+  var fr = flushRank(cards);
+
+  if(fr > 0){
+
+    flushcards = [];
+    flushcards = getFlushCards(cards);
+    flushcards = sortByRank(flushcards);
+    flushcards.splice(5,2);
+    var sr = straightRank(flushcards);
+
+	if(sr > 0){
+	  return sr;
+	};
+  };
+
+  return 0;
+}
+
+function FOAKrank(cards){
+
+  foakRank = 0;
+
+  var hand = sortByRank(cards);
+
+  for(var i = 0; i < hand.length - 3; i++){
+
+  	if(hand[i].rank == hand[i+1].rank && hand[i+1].rank == hand[i+2].rank && hand[i+2].rank == hand[i+3].rank) return hand[i].rank;
+  };
+
+  return foakRank;
+}
+
+function TOAKrank (cards){
+
+  toakRank = 0;
+
+  cards = sortByRank(cards);
+
+  for(var i = 0; i < cards.length-2; i++){
+
+    if(cards[i].rank == cards[i+1].rank && cards[i+1].rank == cards[i+2].rank ) return cards[i].rank;
+  };
+
+  return toakRank;
+
+}
+
+function twoPairRank (cards){
+
+  var hand = sortByRank(cards);
+
+  pairOneRank = 0;
+
+  for(var i = 0; i < hand.length-1; i++){
+
+	if(hand[i].rank == hand[i+1].rank && pairOneRank == 0){
+
+      pairOneRank = hand[i].rank;
+	};
+  };
+
+  if(pairOneRank > 0){
+ 
+	pairTwoRank = 0;
+
+	for(var i = 0; i < hand.length-1; i++){
+
+      if(hand[i].rank != pairOneRank && hand[i+1].rank == hand[i].rank && pairTwoRank == 0){
+
+		pairTwoRank = hand[i].rank;
+	  };
+    };
+  };
+
+  if(pairOneRank > 0 && pairTwoRank > 0){
+
+	return pairOneRank*10 + pairTwoRank;
+  };
+		
+  return 0;
+}
+
+function pairRank(cards) {
+
+  var hand = sortByRank(cards);
+  pairOneRank = 0;
+
+  for(var i = 0; i < hand.length - 1; i++){
+ 	if(hand[i].rank == hand[i+1].rank && pairOneRank == 0){
+      pairOneRank = hand[i].rank;
+	}
+  }
+  return pairOneRank;
+}
+
+function fullHouseRank (cards){
+
+  toakRank = TOAKrank(cards);
+
+  if(toakRank > 0){
+	pRank = 0;
+	for(var i = 0; i < cards.length-1; i++){
+      if(cards[i].rank == cards[i+1].rank && toakRank != cards[i].rank && pRank == 0){
+		pRank = cards[i].rank;
+		return toakRank*10+pRank;
+  	  }
+	}
+  }
+
+  return 0;
+}
+
+function highCardRank (cards){
+
+  hand = sortByRank(cards);
+
+  return hand[0].rank;
+}
+
+
+function resolveTie(p1hand, p2hand, handStrength, handRank){
+
+//we are in this block because two hands ranked the same on a particular strength.
+//so we need to make sure that:
+
+//if the handStrength is 
+//Straight Flush
+//Straight
+//we can't split a tie so just return tie (or don't try to resolve in the first place) <-- this
+
+//TIES WE CAN RESOLVE:
+//FOAK: remove the FOAK cards (get handRank, filter hands of that card)
+//sort by rank and compare the FIRST CARD ONLY
+
+//FLUSH: get the flush cards only. sort and compare each field
+
+//TOAK: remove the TOAK (filter by rank)
+//sort remaining cards by rank and compare FIRST 2
+
+//TWO PAIR: remove the two paired cards by filter from rank)
+//sort remaining cards and compare FIRST CARD ONLY
+
+//PAIR: remove pair cards (by handrank) 
+//sort remaining cards by rank and compare FIRST 3
+
+//high card:
+//sort by rank and compare FIRST 5
+
+  if(handStrength == "FOAK"){
+    var p1cards = p1hand.filter(function(val){
+	  return (val.rank !== handRank);
+	});
+	var p2cards = p1hand.filter(function(val){
+	  return (val.rank !== handrank);
+	});
+
+	p1cards = sortByRank(p1cards);
+	p2cards = sortByRank(p2cards);
+
+	if(p1cards[0].rank > p2cards[0].rank){
+	  return "player1";
+	}
+	else if(p1cards[0].rank < p2cards[0].rank){
+	  return "player2";
+	}
+	else {
+	  return "tie";
+	}
+  }
+
+  else if(handStrength == "FLUSH"){
+    var p1cards = getFlushCards(p1hand);
+	var p2cards = getFlushCards(p2hand);
+
+	p1cards = sortByRank(p1cards);
+	p2cards = sortByRank(p2cards);
+
+	for(var i = 0; i < p1cards.length; i++){
+      if(p1cards[i].rank > p2cards[i].rank){
+		return "player1";
+	  }
+	  else if(p2cards[i].rank > p1cards[i].rank){
+	    return "player2";
+	  }
+	}
+	return "tie";
+  }
+
+  else if(handStrength == "TOAK"){
+	var p1cards = p1hand.filter(function(val){
+  	  return (val.rank !== handRank);
+	});
+	var p2cards = p2hand.filter(function(val){
+	  return (val.rank !== handRank);
+	});
+
+	var p1cards = sortByRank(p1cards);
+	var p2cards = sortByRank(p2cards);
+
+	for(var i = 0; i < 2; i++){
+	  if(p1cards[i].rank > p2cards[i].rank){
+	 	return "player1";
+	  }
+	  else if(p2cards[i].rank > p1cards[i].rank){
+		return "player2";
+	  }
+	}
+	return "tie";
+  }
+
+  else if(handStrength == "TWOPAIR"){
+
+	//sort hands by rank, first card that isn't pair is the strength
+	var p1cards = sortByRank(p1hand);
+	var p2cards = sortByRank(p2hand);
+	var pairs = [];
+
+	for(var i = 0; i < p1cards.length-1; i++){
+  	  if(p1cards[i].rank == p1cards[i+1].rank){
+	    pairs.push(p1cards[i].rank);
+	  }
+	}
+
+	p1cards = p1hand.filter(function(val){
+	  return (val.rank !== pairs[0] && val.rank !== pairs[1]);
+	});
+			
+	p2cards = p2hand.filter(function(val){
+	  return (val.rank !== pairs[0] && val.rank !== pairs[1]);
+	});
+	p1cards = sortByRank(p1cards);
+	p2cards = sortByRank(p2cards);
+
+	if(p1cards[0].rank > p2cards[0].rank){
+	  return "player1";
+	}
+	else if(p1cards[0].rank < p2cards[0].rank){
+	  return "player2";
+	}
+	else{
+	  return "tie";
+	}
+  }
+
+  else if(handStrength == "PAIR"){
+	var p1cards = p1hand.filter(function(val){
+	  return (val.rank !== handRank);  
+	});
+	var p2cards = p2hand.filter(function(val){
+	  return (val.rank !== handRank);
+	});
+
+	var p1cards = sortByRank(p1cards);
+	var p2cards = sortByRank(p2cards);
+
+	for(var i = 0; i < 3; i++){
+	  if(p1cards[i].rank > p2cards[i].rank){
+	 	return "player1";
+	  }
+	  else if(p2cards[i].rank > p1cards[i].rank){
+		return "player2";
+	  }
+	}
+	return "tie";
+  }
+  //resolve high card tie!
+  else {
+ 	var p1cards = sortByRank(p1hand);
+	var p2cards = sortByRank(p2hand);
+
+	for(var i = 0; i < 5; i++){
+   	  if(p1cards[i].rank > p2cards[i].rank){
+		return "player1";
+	  }
+	  else if(p2cards[i].rank > p1cards[i].rank){
+		return "player2";
+	  }
+	}
+	return "tie";
+  }
+}
+
+function handStrength(cards, board){
+  var handStrength = {
+    hand: "",
+	rank: 0,
+	strength: 0
+  };
+	 
+  hand = cards.concat(board);
+
+  straightFlush = straightFlushRank(hand);
+
+  if(straightFlush > 0){
+    handStrength.hand = "straight flush";
+	handStrength.strength = 9;
+	handStrength.rank = straightFlush;
+	return handStrength;
+  }
+
+  foak = FOAKrank(hand);
+
+  if(foak > 0){
+ 	handStrength.hand = "foak";
+	handStrength.rank = foak;
+	handStrength.strength = 8;
+	return handStrength;
+  }
+
+  fullhouse = fullHouseRank(hand);
+
+  if(fullhouse > 0){
+	handStrength.hand = "full house";
+	handStrength.rank = fullhouse;
+	handStrength.strength = 7;
+	return handStrength;
+  }
+
+  flush = flushRank(hand);
+
+  if(flush > 0){
+	handStrength.hand = "flush";
+	handStrength.rank = flush;
+	handStrength.strength = 6;
+	return handStrength;
+  }
+
+  straight = straightRank(hand);
+
+  if(straight > 0){
+ 	handStrength.hand = "straight";
+	handStrength.rank = straight;
+	handStrength.strength = 5;
+	return handStrength;
+  }
+
+  toak = TOAKrank(hand);
+
+  if(toak > 0){
+ 	handStrength.hand = "toak";
+	handStrength.rank = toak;
+	handStrength.strength = 4;
+	return handStrength;
+  }
+
+  twopair = twoPairRank(hand);
+
+  if(twopair > 0){
+	handStrength.hand = "twopair";
+	handStrength.rank = twopair;
+	handStrength.strength = 3;
+	return handStrength;
+  }
+
+  pair = pairRank(hand);
+
+  if(pair > 0){
+	handStrength.hand = "pair";
+	handStrength.rank = pair;
+	handStrength.strength = 2;
+	return handStrength;
+  }
+
+  highcard = highCardRank(hand);
+
+  handStrength.hand = "high card";
+  handStrength.rank = highcard;
+  handStrength.strength = 1;
+  return handStrength;
+}
+
+        </script>
+    	<!-- <script type="text/javascript" src="angular.js"></script> -->
+    	
+    	<!-- <script type="text/javascript" src="angular-route.js"></script> -->
+    	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.9/angular-animate.js"></script>
+    	<style>
+    	body{
+    background: linear-gradient(to right, #3f4c6b, #5b6e9b);
+    font-family: "Open Sans",sans-serif;
+
+    
+}
+html {
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+footer {
+	background: linear-gradient(to right, #363636, #555555);
+	color: #999;
+	text-align: center;
+	position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    font-weight: bold;
+    font-family: 'Ubuntu', sans-serif;
+}
+.fade {
+	flex: 1;
+	border: 1px solid #222;
+	border-radius: 6px;
+	background-color: #fefefe;
+	margin: 8px;
+	padding: 4px;
+	min-height: 100px;
+	max-width: 80px;
+	transition: 1s linear all;
+    -webkit-transition: 1s linear all;
+}
+.turn{
+	box-shadow: 7px 7px 3px #123;
+}
+.red{
+	color: red;
+}
+
+.black{
+	color: black;
+}
+
+.pot {
+	margin-top: 40px;
+	margin-right: 10px;
+	color: white;
+}
+
+.container{
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	perspective: 1000;	
+}
+
+.vertical-center{
+	vertical-align: center;
+	justify-content: center;
+}
+.horiz-center{
+	justify-content: center;
+}
+
+.board{
+	margin-top: 5%;
+	border-radius: 60px;
+	border: 12px solid #987135;
+	background-color: #277714;
+	width: 80%;
+	min-height: 120px;
+}
+.player {
+	justify-content: flex-end;
+	margin-top: 50px;
+}
+
+.gameOver{
+	color: red;
+	font-size: 80px;
+}
+.chips {
+	border: 3px solid #212;
+	border-radius: 3px;
+	box-shadow: 4px 4px 2px #123; 
+	padding: 20px;
+	background: #444444;
+	color: #fff;
+	margin-top: 8px;
+	max-height: 80px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+.c{
+	margin-top: -12px;
+	border-bottom: 4px solid #ddd;
+	max-width: 130px;
+}
+
+.c span {
+	margin-right: -10px;
+}
+.grey {
+	color: #a6a6a6;
+	font-weight: bold;
+}
+button {
+	margin-top: 30px;
+	max-height: 60px;
+	max-width: 100px;
+}
+input {
+	max-width: 80px;
+}
+.button {
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+	display: inline-block;
+	padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    border-radius: 4px;
+}
+
+.baton {
+	padding: 4px;
+	margin-top: 32px;
+	width: 60px;
+	height: 60px;
+	background: red;
+	-moz-border-radius: 30px;
+	-webkit-border-radius: 30px;
+	border-radius: 60px;
+	border: 2px #333 solid;
+}
+.baton p {
+	padding: 3px;
+	text-align: center;
+	color: #eee;
+	font-weight: bold;
+}
+/*.card {
+  transition: 1s linear all;
+  -webkit-transition: 1s linear all;
+}*/
+.fade.ng-enter {
+  opacity: 0;
+}
+
+.fade.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+.fade.ng-leave {
+  display:none;
+}
+
+.fade.ng-leave.ng-leave-active {
+  opacity: 0;
+}
+
+.opponent .row div .fade{
+	background: repeating-linear-gradient(
+  45deg,
+  #3f4c6b,
+  #409870 10px,
+  #465298 10px,
+  #5b6e9b 20px
+);
+}
+
+.whiteagain {
+	background: #fff !important;
+}
+
+.button:hover{
+	background: #efefef;
+}
+
+@media screen and (max-width: 500px){
+    footer {
+    	display: none;
+    }
+}
+</style>
+    	<!-- beautiful FONT! -->
+    	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Ubuntu">
+    </header>
+    <body ng-app="cg">
+    	<ng-view />
+    	<script type="text/ng-template" id="page.html">
+    		<div class="opponent">
+    			<div class="row">
+    				<div class="col-md-4 container" >
+    					  <!-- -->
+    					  <div class="fade" ng-class="{'red': (card.suit == 'h' || card.suit == 'd'), 'black': (card.suit == 's' || card.suit == 'c'), 'turn': !playerTurn, 'whiteagain': gameOver }" ng-repeat="card in opponent.hand">
+    						<div class="front" ng-if="gameOver"> {{printCard(card)}} </div>
+    						<div class="back"></div>
+    					</div>
+	    				<span class="chips">
+	    					<p class="c"> {{opponent.firstName}} chips: {{opponent.chips}} </p>
+	    					<div ng-if="!gameOver && !playerTurn && start"> <!-- && start -->
+			    				<!-- <div class="button" ng-click="aiAction()">ai decide</div> -->
+		    				</div>
+		    				<p class="grey">bet this round: {{pot.opponent}}</p>
+	    				</span>
+	    				<div ng-if="button == 'opponent'" class="baton"><p>dealer</p></div>
+    				</div>
+    			</div>
+    		</div>
+    		<div ng-if="gameOver" class="gameOver container horiz-center">
+    			<a class="button" class="replay" ng-click="replay()">{{winner}} </a>
+    		</div>
+    		<div class="container horiz-center">
+	    		<div class="board">
+		   			<div class="container vertical-center">
+		   				<span class="pot">pot: {{pot.chips}}</span>
+		   				<div class="fade" ng-class="{'red': (card.suit == 'h' || card.suit == 'd'), 'black': (card.suit == 's' || card.suit == 'c') }" ng-repeat="card in board"> <!-- -->
+			   				<span>{{printCard(card)}}</span>
+			   			</div>
+			   			<button ng-if="!start" class="button" ng-click="dealPlayers()">Start Hand</button>
+			   		</div>
+		    	</div>
+		    </div>
+	    	<div class="container player">
+	    		<div ng-if="button == 'player'"class="baton"><p>dealer</p> </div>
+		    	<span class="chips">
+		    		<p class="c"> {{player.firstName}} chips: <span> {{player.chips}} </span> </p>
+		    		<div ng-if="playerTurn && !gameOver && start">
+			    		<input type="number" ng-model="bet.player">
+				    	<div class="button" ng-click="bet('player')">bet </div>
+				    	<div class="button" ng-click="check('player')">check/call </div>
+				    	<div class="button" ng-click="fold('player')">fold </div>
+				    </div>
+			    	<p class="grey">bet this round: {{pot.player}}</p>
+		    	</span>
+	    		<div class="fade" ng-class="{'red': (card.suit == 'h' || card.suit == 'd'), 'black': (card.suit == 's' || card.suit == 'c'), 'turn': playerTurn }" ng-repeat="card in player.hand">
+	    		 <!--  --> 
+	    			<div class="front">{{printCard(card)}}</div>
+	    			<div class="back"></div>
+	    		</div>
+	    	</div>
+	    	<footer> JS HOLD 'EM - Built by Paul Williams </footer>
+    	</script>
+    	<script type="text/javascript">
+angular.module('cg', ['ngRoute', 'ngAnimate'])
+	.config(function ($routeProvider) {
+		'use strict';		
+	
+		var routeConfig = {
+			controller: 'pokerCtrl',
+			templateUrl: "page.html"
+		};	
+
+		$routeProvider.when('/', routeConfig);
+	})
+	.controller('pokerCtrl', function pokerCtrl($http, $scope){
+
+		$scope.bet = {
+			opponent: 0,
+			player: 0
+		};
+		$scope.callMyRaise = false;
+		$scope.minBet = 5;
+		$scope.board = [];
+		$scope.turn = "preflop";
+		$scope.start = false;
+		$scope.gameOver = false;
+		$scope.playerTurn = false;
+		$scope.lastWasCheck = false;
+		$scope.button = "opponent";
+		$scope.pot = {
+			opponent: 0,
+			player: 0,
+			chips: 0,
+			getField: function(name){
+				if(name == "opponent"){
+					return this.opponent;
+				}
+				else if(name == "player"){
+					return this.player;
+				}
+				else if(name == "chips"){
+					return this.chips;
+				}
+				else {
+					return null;
+				}
+			}, 
+			setField: function(name,val){
+				if(name == "opponent"){
+					this.opponent = val;
+				}
+				else if(name == "player"){
+					this.player = val;
+				}
+				else{
+					this.chips = val;
+				}
+			},
+			advanceRound: function(){
+				this.chips += (this.opponent + this.player);
+				this.opponent = 0;
+				this.player = 0;
+			}
+		};
+
+		var deck = new Deck();
+		deck.shuffle();
+
+		$scope.player = new Player("player", 1000);
+		$scope.opponent = new Player("opponent", 1000);
+
+		var players = [$scope.player, $scope.opponent];
+
+		function moveButton() {
+					
+			players[0] = players[1];
+
+			if(players[0].firstName == "player") {
+				players[1] = $scope.opponent;
+				$scope.button = "opponent";
+			}
+			else {
+				players[1] = $scope.player;
+				$scope.button = "player";
+			}
+		}
+
+		$scope.dealPlayers = function(){
+
+			for(var i = 0; i < 2; i++){
+				var card1 = deck.deal();
+				var card2 = deck.deal();
+				players[0].deal(card1);
+				players[1].deal(card2);
+			}
+
+			$scope.pot.setField(players[0].firstName, 0);
+			$scope.pot.setField(players[0].firstName, players[0].bet(10));
+			//$scope.pot.player += $scope.player.bet(10);
+			$scope.pot.setField(players[1].firstName, 0);
+			$scope.pot.setField(players[1].firstName, players[1].bet(5));
+			//$scope.pot.opponent += $scope.opponent.bet(5);
+			getDeficit(players[0].firstName);
+			getDeficit(players[1].firstName);
+			$scope.start = true;
+
+			if(players[1].firstName == "opponent"){
+				$scope.aiAction();
+			}
+		}
+
+		function getDeficit(playername){
+			if(playername == "opponent") {
+				var res = $scope.pot.player - $scope.pot.opponent;
+				if(res >= 0) {
+					$scope.bet.opponent = res;
+					return res;
+				}
+				else {
+					res = 0;
+					$scope.bet.opponent = res;
+					return 0;
+				}
+			}
+
+			if(playername == "player") {
+
+				var res = $scope.pot.opponent - $scope.pot.player;
+
+				if(res >= 0) {
+					$scope.bet.player = res;
+					return res;
+				}
+				else {
+					res = 0;
+					$scope.bet.player = res;
+					return res;
+				}
+			}
+			else  {
+				console.log("error in function getDeficit");
+				return 0;
+			}
+		}
+
+		$scope.nextTurn = function(){
+			var bool = (players[0].firstName == "player");
+			$scope.playerTurn = bool;
+			if($scope.turn == "ALL IN"){
+				console.log("always");
+				while($scope.board.length < 5){
+					$scope.board.push(deck.deal());
+				}
+				winner = determineWinner($scope.player, $scope.opponent, $scope.board);
+				$scope.winner = winner;
+				if(winner.firstName == "player"){
+					$scope.player.win($scope.pot.chips);
+					$scope.winner = "player wins!";
+				}
+				else if(winner.firstName == "opponent"){
+					$scope.opponent.win($scope.pot.chips);
+					$scope.winner = "opponent wins!";
+				}
+				else if(winner == "TIE"){
+					var prize = $scope.pot.chips / 2;
+					$scope.player.win(prize);
+					$scope.opponent.win(prize);
+				}
+				$scope.pot.chips = 0;
+				$scope.gameOver = true;
+			}
+			if($scope.turn == "preflop"){
+				for(var i = 0; i < 3; i++){
+					$scope.board.push(deck.deal());
+				}
+				$scope.turn = "turn";
+			}
+			else if($scope.turn == "turn"){
+				$scope.board.push(deck.deal());
+				$scope.turn = "river";
+			}
+			else if($scope.turn == "river"){
+				$scope.board.push(deck.deal());
+				$scope.turn = "over";
+			}
+			else {
+				winner = determineWinner($scope.player, $scope.opponent, $scope.board);
+				$scope.winner = winner;
+				if(winner.firstName == "player"){
+					$scope.player.win($scope.pot.chips);
+					$scope.winner = "player wins!";
+				}
+				else if(winner.firstName == "opponent"){
+					$scope.opponent.win($scope.pot.chips);
+					$scope.winner = "opponent wins!";
+				}
+				else if(winner == "TIE"){
+					var prize = $scope.pot.chips / 2;
+					$scope.player.win(prize);
+					$scope.opponent.win(prize);
+				}
+				$scope.pot.chips = 0;
+				$scope.gameOver = true;
+			}
+
+			if(!$scope.playerTurn){
+				$scope.aiAction();
+			}					
+		}	
+
+		$scope.printCard = function(card){
+			var cardDisplay = "";
+
+			if(card.rank == 11){
+				cardDisplay += 'J';
+			}
+			else if(card.rank == 12){
+				cardDisplay += 'Q';
+			}
+			else if(card.rank == 13){
+				cardDisplay += 'K';
+			}
+			else if(card.rank == 14){
+				cardDisplay += 'A';
+			}
+			else {
+				cardDisplay += card.rank.toString();
+			}
+			if(card.suit == 'h'){
+				cardDisplay += '♥';
+			}
+			else if(card.suit == 'd'){
+				cardDisplay += '♦';
+			}
+			else if(card.suit == 's'){
+				cardDisplay += '♠';
+			}
+			else if(card.suit == 'c'){
+				cardDisplay += '♣';
+			}
+			return cardDisplay;
+		};
+
+		$scope.replay = function(){
+
+			if($scope.player.chips > 0 && $scope.opponent.chips > 0){
+				deck = new Deck();
+				deck.shuffle();
+				$scope.player.hand = [];
+				$scope.opponent.hand = [];
+				$scope.board = []; 
+				$scope.gameOver = false;
+				$scope.turn = "preflop";
+				$scope.start = false;
+				moveButton();
+				$scope.playerTurn = (players[1].firstName == "player");
+				$scope.lastWasCheck = false;
+				$scope.pot.chips = 0;
+				$scope.dealPlayers();
+			}
+			else{
+				alert("GAME OVER FOR REAL THIS TIME. Refresh to play again.");
+			}
+		}
+
+		$scope.bet = function(player){
+
+			if(player == "opponent"){
+				if(($scope.bet.opponent + $scope.pot.opponent ) > ($scope.pot.player)){
+					//raise
+					if($scope.bet.opponent >= $scope.opponent.chips){
+						$scope.bet.opponent = $scope.opponent.chips;
+						$scope.turn = "ALL IN";
+					}
+					if($scope.bet.opponent >= $scope.player.chips){
+						$scope.bet.opponent = $scope.player.chips;
+						$scope.turn = "ALL IN";
+					}
+					$scope.pot.opponent += $scope.opponent.bet($scope.bet.opponent);
+					$scope.bet.opponent = 0;
+					$scope.bet.player = $scope.pot.opponent - $scope.pot.player;
+					$scope.playerTurn = true;
+					$scope.lastWasCheck = false;
+					if($scope.turn == "preflop"){
+						$scope.callMyRaise = true;
+					}
+				}
+				else {
+					//check or force call
+					var debt = getDeficit("opponent");
+					//forcecall
+					if(debt > 0){
+						if(debt > $scope.opponent.chips){
+							debt = $scope.opponent.chips;
+							$scope.turn = "ALL IN";
+						}
+						$scope.pot.opponent += $scope.opponent.bet(debt);
+						$scope.bet.opponent = 0;
+						if($scope.turn != "preflop" || $scope.callMyRaise){
+							$scope.lastWasCheck = false;
+							$scope.callMyRaise = false;
+							$scope.pot.advanceRound();
+							$scope.nextTurn();	
+						}
+
+						else {
+							$scope.lastWasCheck = true;
+							$scope.playerTurn = true;
+						}
+								
+					}
+					else {
+						if($scope.lastWasCheck){
+							$scope.lastWasCheck = false;
+							$scope.pot.advanceRound();
+							$scope.nextTurn();
+						}
+						else{
+							$scope.lastWasCheck = true;
+							$scope.playerTurn = !$scope.playerTurn;
+						}
+					}
+				}
+			}
+
+			if(player == "player"){
+				if(($scope.bet.player + $scope.pot.player) > ($scope.pot.opponent)){
+					//raise
+					if($scope.bet.player >= $scope.player.chips){
+						$scope.bet.player = $scope.player.chips;
+						$scope.turn = "ALL IN";
+					}
+					if($scope.bet.player >= $scope.opponent.chips){
+						$scope.bet.player = $scope.opponent.chips;
+						$scope.turn = "ALL IN";
+					}
+					$scope.pot.player += $scope.player.bet($scope.bet.player);
+					$scope.bet.opponent = $scope.pot.player - $scope.pot.opponent;
+					$scope.bet.player = 0;	
+					$scope.playerTurn = false;
+					$scope.lastWasCheck = false;
+					if($scope.turn == "preflop"){
+						$scope.callMyRaise = true;
+					}
+					$scope.aiAction();
+				}
+				else{
+					var debt = getDeficit("player");
+					if(debt > 0){
+
+						if(debt > $scope.player.chips){
+							debt = $scope.player.chips;
+							$scope.turn = "ALL IN";
+						}
+						$scope.pot.player += $scope.player.bet(debt);
+						$scope.bet.player = 0;
+						if($scope.turn !== "preflop" || $scope.callMyRaise){
+							$scope.callMyRaise = false;
+							$scope.lastWasCheck = false;
+							$scope.pot.advanceRound();
+							$scope.nextTurn();
+						}
+						else{
+							$scope.playerTurn = false;
+							$scope.lastWasCheck = true;
+							$scope.aiAction();
+						}								
+					}
+					else {
+						if($scope.lastWasCheck){
+							$scope.lastWasCheck = false;
+							$scope.pot.advanceRound();
+							$scope.nextTurn();
+						}
+						else{
+							$scope.lastWasCheck = true;
+							$scope.playerTurn = !$scope.playerTurn;
+							$scope.aiAction();
+						}
+					}
+				}
+			}
+		}
+
+		$scope.check = function(player){
+
+			if(player == "opponent"){
+				var bet = getDeficit("opponent");
+				if(bet == 0){
+					$scope.bet.opponent = 0;
+					if($scope.lastWasCheck){
+						$scope.lastWasCheck = false;
+						$scope.pot.advanceRound();
+						$scope.nextTurn();
+					}
+					else{
+						$scope.lastWasCheck = true;
+						$scope.playerTurn = !$scope.playerTurn;	
+					}			
+				}
+				//force call
+				else{
+					if(bet > $scope.opponent.chips){
+						bet = $scope.opponent.chips;
+						$scope.turn = "ALL IN";
+					}
+
+					$scope.bet.opponent = 0;
+					$scope.pot.opponent += $scope.opponent.bet(bet);
+					if($scope.turn !== "preflop" || $scope.callMyRaise){
+						$scope.lastWasCheck = false;
+						$scope.callMyRaise = false;
+						$scope.pot.advanceRound();
+						$scope.nextTurn();
+					}
+					else {
+						$scope.lastWasCheck = true;
+						$scope.playerTurn = !$scope.playerTurn;
+					}
+				}
+			}
+			
+			else if(player == "player"){
+				var bet = getDeficit("player");
+				if(bet == 0){
+					$scope.bet.player = 0;
+					if($scope.lastWasCheck){
+						$scope.lastWasCheck = false;
+						$scope.pot.advanceRound();
+						$scope.nextTurn();
+					}
+					else{
+						$scope.lastWasCheck = true;
+						$scope.playerTurn = !$scope.playerTurn;
+						$scope.aiAction();
+					}	
+				}
+				//force call
+				else{
+					if(bet > $scope.player.chips){
+						bet = $scope.player.chips;
+						$scope.turn = "ALL IN";
+					}
+
+					$scope.bet.player = 0;
+					$scope.pot.player += $scope.player.bet(bet);
+					if($scope.turn != "preflop" || $scope.callMyRaise){
+						$scope.callMyRaise = false;
+						$scope.lastWasCheck = false;
+						$scope.pot.advanceRound();
+						$scope.nextTurn();
+					}
+					else{
+						$scope.lastWasCheck = true;
+						$scope.playerTurn = !$scope.playerTurn;
+						$scope.aiAction();
+					}	
+				}
+			}
+		}
+
+		$scope.aiAction = function(){
+
+			//need to decide if we want to raise, call, check, or fold. 
+			if($scope.turn == "preflop"){
+				//get high card in hand
+				var hicard; 
+				$scope.opponent.hand[0].rank > $scope.opponent.hand[1].rank? hicard = $scope.opponent.hand[0].rank : hicard = $scope.opponent.hand[1].rank; 
+
+				//if there is a big raise and we don't have an ace or a pair, we fold. 
+				if(getDeficit('opponent') > 40 && hicard < 13 && $scope.opponent.hand[1].rank !== $scope.opponent.hand[0].rank){
+					alert("opponent folds.");
+					$scope.fold('opponent');
+				}
+				else{
+					//raise if we have pocket pair and there aint too much in the pot yet
+					if($scope.opponent.hand[0].rank == $scope.opponent.hand[1].rank && $scope.bet.player < 60){
+						$scope.bet.opponent += $scope.opponent.hand[0].rank * 5;
+						alert("opponent raises " + $scope.bet.opponent);
+						$scope.bet('opponent');
+						console.log("oppont RAISES!");
+					}
+					//check/call
+					else{
+						alert("opponent check/calls (check 'bet this round')");
+						$scope.check('opponent');
+						console.log("opponent pre flop check/calls");
+					}
+				}
+			}
+			//for when we have enough board cards to evaluate the hand strength
+			else {
+				//flop
+				expectedHandStrengthForRound = 1;
+				//turn
+				if($scope.turn == "river"){
+					expectedHandStrengthForRound = 1;
+				}
+				//river
+				if($scope.turn == "over"){
+					expectedHandStrengthForRound = 2;
+				}
+
+				var str = handStrength($scope.opponent.hand, $scope.board);
+				console.log("hand strength: ");
+				console.log(str);
+				//we have a straight or better, and we have been checked to
+				if(str.strength > expectedHandStrengthForRound && $scope.lastWasCheck){
+					$scope.bet.opponent += (20 * (str.strength - expectedHandStrengthForRound));
+					alert("opponent raises: "+$scope.bet.opponent);
+					$scope.bet('opponent');
+				}
+				//we have a straight or better, and the last move was not a check (either the player bet or the opponent is 1st to act)
+				else if(str.strength > expectedHandStrengthForRound){
+					var wow = Math.floor(Math.random() * 10);
+					// 40% of the time, raise based on hand strength
+					if(wow > 6){
+						$scope.bet.opponent += (15 * (str.strength - expectedHandStrengthForRound));
+						alert("opponent raises: "+$scope.bet.opponent);
+						$scope.bet('opponent');
+					}
+					else{
+						alert("opponent check/calls");
+						$scope.check('opponent');
+					}
+				}
+				else {
+					//check if we can
+					if($scope.lastWasCheck || getDeficit('opponent') == 0){
+						alert("opponent checks.");
+						$scope.check('opponent');
+					}
+					//too rich for my blood!
+					else {
+						alert("opponent folds.");
+						$scope.fold('opponent');
+					}
+				}
+			}
+
+			//raise: we raise if last was check and our hand Strength is above 5.
+
+			//call: we call if last was NOT check and hand strength is between 3-5.
+
+			//check: we check if hand strength is below 3 and we can
+
+			//fold: otherwise!
+
+			//special condition: pre flop we have no hand strength, so for now if there is preflop just execute "check/call"
+		}
+
+		$scope.fold = function(player){
+
+			$scope.pot.advanceRound();
+			if(player == "opponent"){
+				$scope.player.win($scope.pot.chips);
+				$scope.winner = "player wins!";
+			}
+			else if(player == "player"){
+				$scope.opponent.win($scope.pot.chips);
+				$scope.winner = "opponent wins!";
+			}
+			$scope.gameOver = true;
+		}
+	});
+    		
+
+    	</script>
+    </body>
+</html>
