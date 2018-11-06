@@ -1,0 +1,226 @@
+<html>
+<head>
+<title>
+Paul's Pragmatic Guide To Quality Code Reviews
+</title>
+<style>
+body {
+  margin: 0px;
+}
+body, body * {
+  font-family: Roboto, Arial, sans-serif;
+}
+div {
+  display: flex;
+  flex-direction: row;
+  height: 300px;
+  width: 100%;
+  background-color: #bbb;
+}
+div h1, div img {
+  flex: 1;
+  width: 50%;
+  line-height: 3rem;
+}
+div img {
+  object-fit: contain;
+}
+div h1 p {
+  font-size: 1.5rem;
+  float: right;
+  margin-right: 4rem;
+}
+h1 {
+  margin-left: 3rem;
+  font-size: 3rem;
+  padding: 3rem;
+}
+h1, strong {
+    color: #333;
+}
+section {
+  height: auto;
+  padding-left: 26%;
+  padding-right: 26%;
+}
+section h2, section p strong {
+  text-align: center;
+}
+section h2 {
+  font-size: 3em;
+  margin-top: 6rem;
+  color: white;
+  background-color: #bbb;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+section p, section ol {
+  color: #444;
+  font-size: 1.5em;
+  line-height: 1.7em;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+section p:first-of-type {
+   margin-top: 4rem;
+}
+#footer {
+   position:fixed;
+   left:0px;
+   bottom:0px;
+   height:30px;
+   width:100%;
+   background:#444;
+}
+#footer h4 {
+  margin: 0 auto;
+  text-align: center;
+  color: white;
+  padding: .3rem;
+}
+
+[aria-describedby="footnote-label"] {
+  counter-increment: footnotes; /* 1 */
+  text-decoration: none; /* 2 */
+  color: inherit; /* 2 */
+  cursor: default; /* 2 */
+  outline: none; /* 2 */
+}
+
+[aria-describedby="footnote-label"]::after {
+  content: '[' counter(footnotes) ']'; /* 1 */
+  vertical-align: super; /* 2 */
+  font-size: 0.5em; /* 3 */
+  margin-left: 2px; /* 4 */
+  color: blue; /* 5 */
+  text-decoration: underline; /* 5 */
+  cursor: pointer; /* 5 */
+}
+section ol {
+  padding: 1.5rem;
+}
+#last {
+  margin-bottom: 4rem;
+}
+</style>
+<body>
+<div>
+  <h1>
+  Paul's Pragmatic Guide To Quality Code Reviews
+    <p> Paul Williams, 11/05/2018 </p>
+  </h1>
+  <img src="https://www.colourbox.com/preview/12620869-diversity-business-team-jumping-celebrating-success.jpg"/>
+</div>
+<section>
+
+<p>
+Code reviews have become an engineering standard. Particularly in a high demand job market,
+employees are not trusted to deploy code to production without peer endorsements.
+It's a simple risk-reducing approach for management, in addition to an attempt to perform as much
+quality assurance as possible within a team. They do not come without difficulty, however.
+I have witnessed multiple occasions where code reviews created trouble for teams.
+</p>
+<!--
+<p>
+Conflicts naturally arise when the management hierarchy is disrupted.
+In most job disciplines, a manager is a stakeholder for the correctness and quality
+in the work of his or her direct reports. However, in 90% of engineering teams,
+SDMs are too busy to be taking on a reviewer responsibility. In other cases,
+they do not have the particular expertise on the product or in a language or framework.
+So, instead of a manager, an engineer becomes responsible for reviewing their peer's work.
+</p>
+<p>
+The problem is that it creates a dependency among peers which can damage egos and hurt feelings,
+as someone is offended when they feel their work is being blocked for political reasons, or that
+a reviewer has given incorrect feedback. Deep in the belly of corporate America, some
+engineers even find themselves without anyone who has any incentive to complete their reviews,
+forcing someone to violate policy just to do their job, or take on the tedious
+burden of having to ask someone else to do extra work.
+</p> -->
+<p>
+The problem is the definition of a "code review" is highly ambiguous.
+Reviews quickly spiral into abstract technical arguments or design discussions
+which can be interesting and educational, but often are inefficient and unproductive.
+The submitter starts by expecting perhaps there are a few stray typos to be found,
+but the reviewer might understand it as an opportunity to propose a cool new design for the system.
+Once feedback has been given, it is difficult to sort out what must be addressed before shipping,
+what can be done for the next release, and what still needs grooming.
+In an effort to mitigate this problem, I am defining set of Code Review Tenets which
+aim to standardize code reviews and make them predictable for all participants.
+</p>
+
+<h2> Tenet 1: Context </h2>
+<p> <strong> Design context is invaluable for a code reviewer, and is best conveyed by the submitter with documentation separate from code. </strong> </p>
+
+<p> Context may be conveyed through variety of artifacts - mock ups, sketches, user stories, api stubs, object definitions,
+Entity Model Relationship Diagrams, development estimates, outside documentation, or research material. </p>
+
+<h2> Tenet 2: Testing </h2>
+<p><strong>A code review must be submitted with a test plan. </strong></p>
+
+<p> A test plan must include: </p>
+<ol>
+  <li>  User stories, detailing how the change impacts customer workflows in every case. </li>
+  <li>  Tests, in the order of most to least preferable: unit, integration, E2E, manual test steps reproducable by all reviewers. </li>
+</ol>
+
+<h2> Tenet 3: Resolution </h2>
+<p> <strong> If a code review is to be rejected, the reviewer must provide a categorical reason and propose a solution. </strong> </p>
+
+<p> The submitter should know exactly how to resolve the feedback upon receiving it.</p>
+
+<p> There are three cases for which a reviewer should reject a review, listed in order of highes to lowest priority:</p>
+
+<ol>
+  <li> Correctness - When the code does not enable the described feature for <a aria-describedby="footnote-label" href="#security"> 100% of applicable customers. </a> </li>
+
+  <li> Efficiency - When run-time efficiency can be improved. </li>
+
+  <li> Maintenance - that the code is not written to be optimally maintainable. </li>
+</ol>
+
+
+<h2> Tenet 4: Priority </h2>
+<p><strong> Code Maintenance is not a customer facing issue. </strong> </p>
+
+<p> More specifically, it's still the submitter's problem to fix. But if a feature release is blocked due to a pending syntactic refactor, your team is full of lazy sons of bitches. Why? Because it would take 2 minutes of effort to fix. </p>
+
+<p>
+Generally, there are two rules for maintenance:
+</p>
+<ol>
+<li> Naming - every variable name in code should be as descriptive and transparent to its purpose as possible.
+</li>
+<li> Brevity - in all other cases, the preferred implementation uses the least number of characters while appeasing all other tenets.
+</li>
+</ol>
+
+<p> These rules are language agnostic and address the two worst problems in any code base - bad variable names and code that is hard to read. While some may say brevity is not a
+
+catch-all for clarity, I'll stand by my position when it comes to code. The less code there is, the more likely I am to actually read it all and make an attempt to understand it. The more code there is,
+
+the harder it becomes for any person to read it all, and naturally this decays into no one understanding it all within 6 months in a corporate environment. </p>
+<h2> Tenet 5: Style </h2>
+<p> <strong> Style guides should be enforced through automation. </strong> </p>
+
+<p id="last"> Enforcing style through automation reduces the reviewer's burden. Style is merely a subset of the greater category of code maintenance. </p>
+<p>
+</p>
+<p> Establishing guidelines for code reviews helps to create a standardized process.
+It makes code reviews more effective in achieving their intended purpose, to ensure quality.
+Whether a development team is small or large, front end or back end, doing reviews online through pull requests or in person with SVN or HG,
+these principles can help teams in their journey to create products of the highest standard for customers.
+</p>
+
+<hr>
+<ol>
+  <li id="security">
+In cases where a test plan or context is missing, this should be the rejection reason. Issues of security are covered under "Correctness", as security is a constant business requirement for all code.
+  </li>
+</ol>
+<div id="footer">
+<h4> paul.scott.williams@gmail.com </h4>
+</div>
+</section>
+</body>
+</html>
