@@ -1,0 +1,15 @@
+export const sceneTuning = {
+  background: '#050816',
+  cameraDefault: [0, 1.15, 12.2] as const,
+  cameraMobile: [0, 1.6, 13.8] as const,
+  cameraLookAt: [0, 0.25, 0] as const,
+  sunScale: 1.65,
+  frontAngleOffset: Math.PI / 2,
+  orbitRadius: 4.9,
+  orbitVerticalOffset: 0.12,
+  transitionLerp: 0.07,
+  reducedMotionTransitionLerp: 0.2,
+  deEmphasisOpacity: 0.52,
+  starCount: 900,
+  starRadius: 64,
+};
