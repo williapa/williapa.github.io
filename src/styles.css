@@ -68,10 +68,10 @@ a {
   position: relative;
   max-height: calc(100vh - 3rem);
   border-radius: 1.8rem;
-  overflow: hidden;
 }
 
 .canvas-shell {
+  overflow: hidden;
   border: 1px solid rgba(160, 186, 255, 0.12);
   background: radial-gradient(circle at top, rgba(37, 82, 150, 0.2), transparent 32%),
     rgba(4, 7, 18, 0.62);
@@ -80,7 +80,7 @@ a {
 }
 
 .eyebrow,
-.project-kicker {
+.project-card .project-kicker {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -102,6 +102,7 @@ a {
     rgba(7, 10, 22, 0.72);
   backdrop-filter: blur(16px);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.42);
+  overflow-y: scroll;
 }
 
 .panel-shell h1,
