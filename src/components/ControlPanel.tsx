@@ -53,7 +53,7 @@ export function ControlPanel({
       </div>
 
       <article className="project-card" aria-live="polite">
-        <p className="project-kicker">Current selection</p>
+        { /* <p className="project-kicker">Current selection</p> */ }
         <h2>{selectedItem.title}</h2>
         <p>{selectedItem.description}</p>
         <div className="action-row">

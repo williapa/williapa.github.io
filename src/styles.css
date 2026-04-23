@@ -59,7 +59,7 @@ a {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 440px);
   gap: 1.5rem;
   align-items: stretch;
-  min-height: 100vh;
+  max-height: 100vh;
   z-index: 1;
 }
 
@@ -102,7 +102,7 @@ a {
     rgba(7, 10, 22, 0.72);
   backdrop-filter: blur(16px);
   box-shadow: 0 26px 80px rgba(0, 0, 0, 0.42);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .panel-shell h1,

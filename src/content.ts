@@ -3,7 +3,7 @@ import type { SiteContent } from './types';
 export const siteContent: SiteContent = {
   ownerName: 'Paul Williams',
   intro:
-    'Interactive worlds, turn-based systems, and rule-heavy web experiments built out of love for the browser.',
+    'Frontend-focused software engineer based in Henderson, Nevada.',
   resume: {
     label: 'Resume',
     href: '/Paul_Williams_Resume.pdf',
