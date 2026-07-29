@@ -12,6 +12,24 @@ export const siteContent: SiteContent = {
   },
   projects: [
     {
+      id: 'ofc-poker',
+      title: 'OFC Poker',
+      url: 'https://williapa.github.io/ofc-poker',
+      description:
+        'Open Face Chinese Poker for 2–4 players. Play against AI opponents or start a real-time multiplayer table via shareable link. Multiplayer powered by PlayroomKit.',
+      theme: {
+        surface: '#b76cff',
+        atmosphere: '#edc7ff',
+        accent: '#ffe8ff',
+        emissive: '#591b88',
+        size: 0.81,
+        orbitRadius: 3.0,
+        orbitSpeed: 0.095,
+        labelOffset: [0, 1.4, 0],
+        tilt: [0.38, -0.42, 0.2],
+      },
+    },
+    {
       id: 'glinski',
       title: 'Glinski',
       url: 'https://williapa.github.io/glinski',

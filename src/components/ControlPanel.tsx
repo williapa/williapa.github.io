@@ -29,7 +29,7 @@ export function ControlPanel({
 
   return (
     <section className="panel-shell" aria-label="Portfolio details">
-      <div className="eyebrow">Orbiting Projects</div>
+      <div className="eyebrow">Planet Portfolio</div>
       <h1>{ownerName}</h1>
       <p className="intro-copy">{intro}</p>
 
