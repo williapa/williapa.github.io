@@ -64,9 +64,9 @@ export function ControlPanel({
           >
             Open project
           </button>
-          <button type="button" className="secondary-action" onClick={onResume}>
+         {/*<button type="button" className="secondary-action" onClick={onResume}>
             {resume.available ? 'Download resume' : 'Resume'}
-          </button>
+          </button>*/}
         </div>
       </article>
     </section>

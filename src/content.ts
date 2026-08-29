@@ -6,8 +6,8 @@ export const siteContent: SiteContent = {
     'Frontend-focused software engineer based in Henderson, Nevada.',
   resume: {
     label: 'Resume',
-    href: '/Paul_Williams_Resume.pdf',
-    available: true,
+    href: '/',
+    available: false,
     placeholderMessage: '',
   },
   projects: [
@@ -48,11 +48,11 @@ export const siteContent: SiteContent = {
       },
     },
     {
-      id: 'medalversus',
-      title: 'MedalVersus',
-      url: 'https://github.com/williapa/TBS',
+      id: 'hostileHexagons',
+      title: 'Hostile Hexagons',
+      url: 'https://hostilehexagons.key-value.workers.dev/',
       description:
-        'MedalVersus is a turn-based strategy game on a hexagonal board inspired by Advanced Wars. Players can build custom maps, battle live opponents through websockets, and track results across their match history.',
+        'Hostile Hexagons is a turn-based strategy game on a hexagonal board inspired by Advanced Wars. Players can build custom maps, battle live opponents through websockets, and track results across their match history.',
       theme: {
         surface: '#f58f43',
         atmosphere: '#ffd5a3',
