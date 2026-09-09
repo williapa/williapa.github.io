@@ -59,7 +59,7 @@ a {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 440px);
   gap: 1.5rem;
   align-items: stretch;
-  max-height: 100vh;
+  height: 100vh;
   z-index: 1;
 }
 
