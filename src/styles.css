@@ -27,7 +27,7 @@ body,
 
 body {
   min-height: 100vh;
-  overflow: auto;
+  overflow: hidden;
 }
 
 button,
@@ -37,7 +37,8 @@ a {
 
 .app-shell {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   isolation: isolate;
   padding: 1.5rem;
 }
@@ -59,7 +60,7 @@ a {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 440px);
   gap: 1.5rem;
   align-items: stretch;
-  height: 100vh;
+  height: 100%;
   z-index: 1;
 }
 
@@ -230,18 +231,27 @@ button:focus-visible {
 }
 
 @media (max-width: 980px) {
+  body {
+    overflow: auto;
+  }
+
   .app-shell {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
     padding: 1rem;
   }
 
   .workspace-grid {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: auto;
   }
 
   .canvas-shell,
   .panel-shell {
     width: 100%;
+    max-height: none;
     min-height: 58vh;
   }
 }

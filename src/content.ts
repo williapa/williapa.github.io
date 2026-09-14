@@ -4,7 +4,7 @@ const radius = 3.0;
 export const siteContent: SiteContent = {
   ownerName: 'Paul Williams',
   intro:
-    'Frontend-focused software engineer based in Henderson, Nevada.',
+    'Software engineer based in Henderson, Nevada.',
   resume: {
     label: 'Resume',
     href: '/',
